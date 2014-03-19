@@ -1,0 +1,294 @@
+package net.expansion.mod;
+
+import net.expansion.block.BlockGrapeLeaves;
+import net.expansion.block.BlockGrapeLog;
+import net.expansion.block.BlockGrapeSapling;
+import net.expansion.block.BlockGreensand;
+import net.expansion.block.BlockGreenstone;
+import net.expansion.block.BlockOreExpansion;
+import net.expansion.block.BlockRedDirt;
+import net.expansion.block.BlockRedGrass;
+import net.expansion.item.BogArmor;
+import net.expansion.item.ItemArsenic;
+import net.expansion.item.ItemArsenicSword;
+import net.expansion.item.ItemBase;
+import net.expansion.mob.EntityEnderEater;
+import net.expansion.mob.EntityHellChicken;
+import net.expansion.mob.RenderHellChicken;
+import net.expansion.world.BiomeGenBog;
+import net.expansion.world.BiomeGenGreen;
+import net.expansion.world.BiomeGenRed;
+import net.expansion.world.Grape_Bonemeal_Event;
+import net.expansion.world.WorldGenGrapeTrees;
+import net.expansion.world.WorldGeneratorExpansion;
+import net.minecraft.block.Block;
+import net.minecraft.client.model.ModelChicken;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityEggInfo;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.item.EnumArmorMaterial;
+import net.minecraft.item.EnumToolMaterial;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.ChestGenHooks;
+import net.minecraftforge.common.DungeonHooks;
+import net.minecraftforge.common.EnumHelper;
+import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+@Mod(modid = MainFile.modid, name = "Expansion", version = "Pre-Alpha v1.0")
+@NetworkMod(clientSideRequired = true, serverSideRequired = false)
+public class MainFile {
+
+	public static final String modid = "expansion";
+	
+	//blocks
+	public static Block blockOreExpansion;
+	public static Block oreArsenic;
+	public static Block oreManganese;
+	public static Block oreBlueLace;
+	public static Block oreBog;
+	public static Block oreLux;
+	public static Block greensand;
+	public static Block greenstone;
+	public static Block grapeleaves;
+	public static Block grapelog;
+	public static Block grapesapling;
+	public static Block blockRedgrass;
+	public static Block blockReddirt;
+	
+
+	//items
+	public static Item itemArsenic;
+	public static Item itemManganese;
+	public static Item itemBlueLace;
+	public static Item itemCausticDiamond;
+	public static Item itemBogIron;
+	
+	public static Item itemArsenicSword;
+	
+	//armor
+	public static Item itemBogHelm;
+	public static Item itemBogPlate;
+	public static Item itemBogLegs;
+	public static Item itemBogBoots;
+	
+	public static EnumArmorMaterial BogArmor = EnumHelper.addArmorMaterial("BogArmor", 37, new int[] { 3, 8, 6, 3 }, 25);
+	
+	
+	//tabs
+	public static CreativeTabs expansionTab;
+
+	public static BiomeGenBase greenBiome;
+	public static BiomeGenBase bogBiome;
+	public static BiomeGenBase redBiome;
+
+	@SidedProxy(clientSide = "net.expansion.mod.ExpansionClientProxy", serverSide = "net.expansion.mod.ExpansionCommonProxy") 
+	public static ExpansionCommonProxy proxy;
+	
+	@EventHandler
+	public void load(FMLInitializationEvent e){
+		
+		expansionTab = new CreativeTabs("expansiontab"){
+			@SideOnly(Side.CLIENT)
+			public int getTabIconItemIndex(){
+				return Block.coalBlock.blockID;
+			}
+			
+		};
+		
+		  /*   \u00a7a or §
+	        * 0 - Black
+	          1 - Dark Blue
+	          2 - Dark Green
+	          3 - Dark Aqua
+	          4 - Dark Red
+	          5 - Purple
+	          6 - Orange (Gold)
+	          7 - Gray
+	          8 - Dark Gray
+	          9 - Indigo
+	          a - Bright Green
+	          b - Aqua
+	          c - Red
+	          d - Pink
+	          e - Yellow
+	          f - White
+	          */
+
+		
+		//ExpansionConfig.init(e.getSuggestedConfigurationFile());
+		
+		LanguageRegistry.instance().addStringLocalization(expansionTab.getTranslatedTabLabel(), " \u00a76CausticCraft");
+
+		oreArsenic = (new BlockOreExpansion(ExpansionConfig.oreArsenicID)).setHardness(3.0F).setResistance(5.0F).setUnlocalizedName("arsenic_ore");
+			registerBlock(oreArsenic, "Arsenic Ore");
+		oreManganese = (new BlockOreExpansion(502)).setHardness(3.0F).setUnlocalizedName("manganese_ore");
+			registerBlock(oreManganese, "Manganese Ore");
+		oreBlueLace = (new BlockOreExpansion(503)).setHardness(3.0F).setUnlocalizedName("bluelace_ore");
+			registerBlock(oreBlueLace, "Blue Lace Ore");
+		oreBog = (new BlockOreExpansion(504)).setHardness(3.0F).setUnlocalizedName("bog_ore");
+			registerBlock(oreBog, "Bog Iron Ore");
+		oreLux = (new BlockOreExpansion(505)).setHardness(3.0F).setLightValue(1F).setUnlocalizedName("lux_ore");
+			registerBlock(oreLux, "\u00a7eLux Ore");
+		
+		greensand = (new BlockGreensand(200)).setHardness(3.0F).setResistance(5.0F).setUnlocalizedName("greensand");
+			registerBlock(greensand, "Green Sand");
+		greenstone = (new BlockGreenstone(201)).setHardness(3.0F).setResistance(5.0F).setUnlocalizedName("turbidite");
+			registerBlock(greenstone, "Turbidite Stone");
+		
+		grapeleaves = (new BlockGrapeLeaves(202)).setHardness(0.1F).setResistance(0.2F).setUnlocalizedName("rareleaves");
+			registerBlock(grapeleaves, "Grapefruit Leaves");
+		grapelog = (new BlockGrapeLog(203)).setHardness(0.3F).setResistance(0.3F);
+			registerBlock(grapelog, "Grapefruit Tree Log");	
+		grapesapling = new BlockGrapeSapling(1019).setUnlocalizedName("sapling_cave");
+			registerBlock(grapesapling, "Grapefruit Tree Sapling");
+			
+		blockRedgrass = (new BlockRedGrass(204)).setUnlocalizedName("");
+			registerBlock(blockRedgrass, "§4Red Grass");
+		blockReddirt = (new BlockRedDirt(205)).setHardness(3.0F).setResistance(5.0F).setUnlocalizedName("reddirt");
+			registerBlock(blockReddirt, "§4Red Dirt");
+			
+
+	
+		//items
+		itemArsenic = new ItemArsenic(7000).setUnlocalizedName("arsenic_dust");
+			registerItem(itemArsenic, "Arsenic Dust");
+		itemBlueLace = new ItemBase(7001).setUnlocalizedName("bluelace_ingot");
+			registerItem(itemBlueLace, "Blue Lace Clump");
+		itemManganese = new ItemBase(7002).setUnlocalizedName("manganese_chunk");
+			registerItem(itemManganese, "Manganese Powder");
+		itemCausticDiamond = new ItemBase(7003).setUnlocalizedName("causticdiamond");
+			registerItem(itemCausticDiamond, "\u00a73Caustic Diamond");
+		itemBogIron = new ItemBase(7004).setUnlocalizedName("bogiron");
+			registerItem(itemBogIron, "Bog Iron Ingot");
+			
+		itemArsenicSword = new ItemArsenicSword(10000, EnumToolMaterial.IRON).setUnlocalizedName("arsenic_sword");
+			registerItem(itemArsenicSword, "Arsenic Sword");
+
+		//armor
+		
+		
+		itemBogHelm = new BogArmor(2055, BogArmor, 0, 0, "bog").setUnlocalizedName("bog_helmet");//last int is texture prefix
+		itemBogPlate = new BogArmor(2056, BogArmor, 0, 1, "bog").setUnlocalizedName("bog_plate");
+		itemBogLegs = new BogArmor(2057, BogArmor, 0, 2, "bog").setUnlocalizedName("bog_legs");
+		itemBogBoots = new BogArmor(2058, BogArmor, 0, 3, "bog").setUnlocalizedName("bog_boots");
+		
+		registerItem(itemBogHelm, "§aM§2a§ar§2s§ah §2J§au§2g§ag§2e§ar§2n§aa§2u§at §2H§ae§2l§am§2e§at");
+		registerItem(itemBogPlate, "§aM§2a§ar§2s§ah §2J§au§2g§ag§2e§ar§2n§aa§2u§at §2C§ah§2e§as§2t§ap§2l§aa§2t§ae");
+		registerItem(itemBogLegs, "§aM§2a§ar§2s§ah §2J§au§2g§ag§2e§ar§2n§aa§2u§at §2B§ao§2o§at§2s");
+		registerItem(itemBogBoots, "§aM§2a§ar§2s§ah §2J§au§2g§ag§2e§ar§2n§aa§2u§at §2L§ae§2g§ag§2i§an§2g§as");
+
+		
+		//recipes
+		
+		GameRegistry.addRecipe(new ItemStack(itemBogHelm, 1), new Object[]{
+			"xyx","x x",'x', itemCausticDiamond, 'y', itemBogIron});
+		
+		GameRegistry.addRecipe(new ItemStack(itemBogPlate, 1), new Object[]{
+			"x x","xyx","xxx",'x', itemCausticDiamond, 'y', itemBogIron});
+		
+		GameRegistry.addRecipe(new ItemStack(itemBogLegs, 1), new Object[]{
+			"xyx","x x","x x",'x', itemCausticDiamond, 'y', itemBogIron});
+		
+		GameRegistry.addRecipe(new ItemStack(itemBogBoots, 1), new Object[]{
+			"y y","x x",'x', itemArsenic, 'y', itemBogIron});
+		
+	//	GameRegistry.addRecipe(new ItemStack(blockShell), new Object[]{
+		//	"xyx", "yxy", "xyx" , 'x', Block.stone, 'y', itemWoodFossil});
+		
+		
+		GameRegistry.addRecipe(new ItemStack(itemCausticDiamond, 1), new Object[]{
+			" x ", "xyx", " x ", 'x', itemArsenic, 'y', Item.diamond});
+		
+		GameRegistry.addRecipe(new ItemStack(itemArsenicSword, 1), new Object[]{
+			" x ", "xxx", " y ", 'x', itemCausticDiamond, 'y', Item.stick});
+		
+		GameRegistry.addSmelting(oreBog.blockID, new ItemStack (itemBogIron, 1), 0.5F );
+		
+		//biomes
+		
+		greenBiome = new BiomeGenGreen(150).setBiomeName("Green").setColor(2900485).setDisableRain().setMinMaxHeight(0.2F, 1F);
+		GameRegistry.addBiome(greenBiome);
+		
+		bogBiome = new BiomeGenBog(151).setBiomeName("Bog").setColor(2900485).setMinMaxHeight(-0.2F, 0.1F).setTemperatureRainfall(0.8F, 0.9F);
+		GameRegistry.addBiome(bogBiome);
+		
+		//.setColor(2900485).setMinMaxHeight(0.2F, 0.1F).setTemperatureRainfall(0.8F, 0.9F)
+		redBiome = new BiomeGenRed(152).setBiomeName("Red");
+		GameRegistry.addBiome(redBiome);
+		
+		
+		//hooks
+		
+		//MinecraftForge.addDungeonLoot(new ItemStack(MainFile.itemManganese), 20, 0, 3);
+		DungeonHooks.addDungeonMob("Blaze", 2);
+		ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(itemManganese),1,3,065));
+		MinecraftForge.addGrassSeed(new ItemStack(Item.melonSeeds), 5);
+		
+		//mobs
+	
+		proxy.registerRenderers();
+		
+		registerEntity(EntityHellChicken.class, "NChicken", 0x800000, 0xFFCC00);
+		LanguageRegistry.instance().addStringLocalization("entity.NChicken.name", "Nether Chicken");
+		
+		registerEntity(EntityEnderEater.class, "EndEat", 0x800000, 0xFFCC00);
+		LanguageRegistry.instance().addStringLocalization("entity.EndEat.name", "Ender Eater");
+		
+		EntityRegistry.addSpawn(EntityHellChicken.class, 1000, 2, 7, EnumCreatureType.creature, BiomeGenBase.hell);
+		EntityRegistry.addSpawn(EntityHellChicken.class, 10, 2, 7, EnumCreatureType.creature, BiomeGenBase.desert);
+		//EntityRegistry.addSpawn(EntityHellChicken.class, 1000, 2, 7, EnumCreatureType.creature, BiomeGenBase.plains);
+		//EntityRegistry.addSpawn(EntityHellChicken.class, 1000, 2, 7, EnumCreatureType.creature, BiomeGenBase.beach);
+		//EntityRegistry.addSpawn(EntityHellChicken.class, 1000, 2, 7, EnumCreatureType.creature, BiomeGenBase.river);
+		EntityRegistry.addSpawn(EntityHellChicken.class, 100, 2, 7, EnumCreatureType.creature, MainFile.redBiome);	
+			
+		//world
+		GameRegistry.registerWorldGenerator(new WorldGeneratorExpansion());
+		GameRegistry.registerWorldGenerator(new WorldGenGrapeTrees(false));
+
+		
+		
+		
+	MinecraftForge.EVENT_BUS.register(new Grape_Bonemeal_Event());
+	
+	}
+	
+	public void registerBlock(Block block, String name){
+		GameRegistry.registerBlock(block, block.getUnlocalizedName());
+		LanguageRegistry.addName(block, name);
+	}
+	
+	public void registerItem(Item item, String name){
+		GameRegistry.registerItem(item, item.getUnlocalizedName());
+		LanguageRegistry.addName(item, name);
+	}
+	
+	public void registerEntity(Class<? extends Entity> entityClass, String entityName, int bkEggColor, int fgEggColor) {
+		int id = EntityRegistry.findGlobalUniqueEntityId();
+
+		EntityRegistry.registerGlobalEntityID(entityClass, entityName, id);
+		EntityList.entityEggs.put(Integer.valueOf(id), new EntityEggInfo(id, bkEggColor, fgEggColor));
+		}
+
+	public void addSpawn(Class<? extends EntityLiving> entityClass, int spawnProb, int min, int max, BiomeGenBase[] biomes) {
+		if (spawnProb > 0) {
+		EntityRegistry.addSpawn(entityClass, spawnProb, min, max, EnumCreatureType.creature, biomes);
+		}
+	}
+}
